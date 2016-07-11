@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "verilog-parser/src/verilog_parser.h"
+
 int main(int argc, char ** argv)
 {
     int i;
