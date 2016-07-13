@@ -48,6 +48,47 @@ void walk_port_declaration(
 }
 
 /*!
+@brief Handles net declarations.
+*/
+void walk_net_declaration(
+    dot_file                * graph, //!< The graph to emit to.
+    dot_node                  parent, //!< parent node of the module.
+    ast_type_declaration    * item   //!< The item to walk.
+){
+    dot_node id = dot_new_node(graph);
+
+    char * params[2];
+    params[0] = "Net Type";
+    params[1] = "Width";
+
+    char * values[2];
+
+    char * type;
+    switch(item -> type)
+    {
+        case DECLARE_NET:
+            if(item -> net_type == NET_TYPE_WIRE){
+                values[0] = "Wire";
+            }
+            if(item -> range == NULL){
+                values[1] = "1 Bit";
+            } else{
+                values[1] = "Bit Range";
+            }
+            ast_identifier net_name = ast_list_get(item -> identifiers,0);
+
+            dot_emit_record_node(graph,id,
+                net_name->identifier,params,values,2);
+            dot_emit_edge(graph,parent,id);
+
+            break;
+        default:
+            break;
+    }
+
+}
+
+/*!
 @brief Responsible for correctly identifying the type of a module item,
 and then moving to the next function which deals with it properly.
 */
@@ -57,10 +98,15 @@ void walk_module_items(
     ast_module_item         * item   //!< The item to walk.
 ){
     char * item_type;
+
+    dot_node id = dot_new_node(graph);
+    dot_emit_edge(graph, parent, id);
+
     switch(item -> type)
     {
         case MOD_ITEM_NET_DECLARATION:
             item_type = "Net Declaration";
+            walk_net_declaration(graph,id,item->net_declaration);
             break;
         case MOD_ITEM_CONTINOUS_ASSIGNMENT:
             item_type = "Continuous Assignment";
@@ -69,11 +115,8 @@ void walk_module_items(
             item_type = "module_item";
             break;
     }
-
-    dot_node id = dot_new_node(graph);
-
+    
     dot_emit_node(graph, id, item_type);
-    dot_emit_edge(graph, parent, id);
 }
 
 /*!
