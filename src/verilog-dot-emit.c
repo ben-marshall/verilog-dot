@@ -44,6 +44,31 @@ void dot_emit_node(dot_file * graph, dot_node id, char * label)
     fprintf(graph -> file,"\t%d [label=\"%s\"];\n",id,label);
 }
 
+
+/*!
+@brief Emits a record node to the graph, with a given ID, label and set of
+characteristics.
+*/
+void dot_emit_record_node(
+    dot_file * graph, 
+    dot_node id, 
+    char * label,
+    char ** parameters, 
+    char ** values, 
+    int num_params
+){
+    fprintf(graph -> file,"\t%d [shape=none,label=<<table border='0' cellborder='1' cellspacing='0' cellpadding='4'><tr><td colspan='%d' bgcolor='black' ><font color='white'><b>%s</b></font></td></tr>\n",id,num_params,label);
+
+    int i;
+    for(i = 0; i < num_params; i++){
+        fprintf(graph->file,"<tr>");
+        fprintf(graph -> file, "<td><b>%s</b></td>",parameters[i]);
+        fprintf(graph -> file, "<td>%s</td>",values[i]);
+        fprintf(graph->file,"</tr>");
+    }
+    fprintf(graph->file,"</table>>];");
+}
+
 /*!
 @brief Emits an edge between two pre-defined nodes.
 */

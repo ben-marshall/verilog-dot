@@ -15,12 +15,34 @@ void walk_port_declaration(
     ast_port_declaration    * port   //!< The port to walk.
 ){
     int P;
+    char *params[2];
+    params[0] = "Direction:"; 
+    params[1] = "Width:";
+    char *values[2];
+
+    switch(port -> direction)
+    {
+        case PORT_INPUT : values[0] = "<font color='red'>input</font>"; break;
+        case PORT_OUTPUT: values[0] = "<font color='blue'>output</font>";break;
+        case PORT_INOUT : values[0] = "<font color='green'>inout</font>";break;
+        case PORT_NONE  : values[0] = "unknown"; break;
+        default         : values[0] = "unknown"; break;
+    }
+
+    if(port -> range == NULL){
+        values[1] = "1 Bit";
+    }
+    else{
+        values[1] = "Range";
+    }
+
     for(P = 0; P < port -> port_names -> items; P++)
     {
         dot_node id = dot_new_node(graph);
         ast_identifier name = ast_list_get(port -> port_names, P);
 
-        dot_emit_node(graph, id, name -> identifier);
+        dot_emit_record_node(graph, id, name -> identifier,
+            params, values, 2);
         dot_emit_edge(graph, parent, id);
     }
 }

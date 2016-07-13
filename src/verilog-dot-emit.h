@@ -47,6 +47,19 @@ dot_node dot_new_node(dot_file * graph);
 void dot_emit_node(dot_file * graph, dot_node id, char * label);
 
 /*!
+@brief Emits a record node to the graph, with a given ID, label and set of
+characteristics.
+*/
+void dot_emit_record_node(
+    dot_file * graph, 
+    dot_node id, 
+    char * label,
+    char ** parameters, 
+    char ** values, 
+    int num_params
+);
+
+/*!
 @brief Emits an edge between two pre-defined nodes.
 */
 void dot_emit_edge(dot_file * graph, dot_node id1, dot_node id2);
