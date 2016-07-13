@@ -80,11 +80,17 @@ shell_args * parse_args(int argc, char ** argv)
         }
     }
 
-    if(tr -> input_file_path == NULL ||
-        tr -> output_file_path == NULL)
+    if(tr -> input_file_path == NULL)
     {
         free(tr);
         print_help(BOOL_TRUE);
+    }
+    if(tr -> output_file_path == NULL)
+    {
+        size_t inleng = strlen(tr -> input_file_path);
+        tr -> output_file_path = calloc(inleng+4,sizeof(char));
+        strcat(tr -> output_file_path, tr -> input_file_path);
+        strcat(tr -> output_file_path, ".dot");
     }
 
     return tr;
@@ -99,6 +105,38 @@ int main(int argc, char ** argv)
         printf("Input File:  %s\n", args -> input_file_path);
         printf("Output File: %s\n", args -> output_file_path);
     }
+
+    // Open and validate the input file.
+    args -> input_file = fopen(args -> input_file_path, "r");
+    if(args -> input_file == NULL)
+    {
+        printf("ERROR: Unable to open input file for reading:\n");
+        printf("\t%s\n",args -> input_file_path);
+        free(args);
+        return 1;
+    }
+
+
+    // Initialise the parser.
+    verilog_parser_init();
+
+    // Parse our input file.
+    int result = verilog_parse_file(args -> input_file);
+
+    // If the parse didn't work, then print an error message and quit.
+    if(result != 0)
+    {
+        printf("ERROR: Failed to parse input file.\n");
+        printf("\t%s\n",args -> input_file_path);
+        free(args);
+        return 1;
+    }
+    else if(args -> verbose)
+    {
+        printf("Parsing of input file successful.\n");
+    }
+
+    verilog_source_tree * ast = yy_verilog_source_tree;
 
     return 0;
 }
