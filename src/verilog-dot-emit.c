@@ -36,6 +36,21 @@ void dot_file_finish(dot_file * graph)
     fclose(graph -> file);
 }
 
+/*!
+@brief Emits a simple node to the graph, with a given ID and label.
+*/
+void dot_emit_node(dot_file * graph, dot_node id, char * label)
+{
+    fprintf(graph -> file,"\t%d [label=\"%s\"];\n",id,label);
+}
+
+/*!
+@brief Emits an edge between two pre-defined nodes.
+*/
+void dot_emit_edge(dot_file * graph, dot_node id1, dot_node id2)
+{
+    fprintf(graph -> file, "\t %d -- %d\n", id1,id2);
+}
 
 /*!
 @brief Generates a new node ID for the graph and returns it.

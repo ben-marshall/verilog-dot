@@ -6,7 +6,8 @@ project (verilog-dot-exe)
 add_subdirectory(./verilog-parser)
 
 set(VERILOG_DOT_SRC main.c
-                    verilog-dot-emit.c)
+                    verilog-dot-emit.c
+                    verilog-ast-walk.c)
 
 set(VERILOG_DOT_EXE verilog-dot)
 

@@ -41,4 +41,14 @@ void dot_file_finish(dot_file * graph);
 */
 dot_node dot_new_node(dot_file * graph);
 
+/*!
+@brief Emits a simple node to the graph, with a given ID and label.
+*/
+void dot_emit_node(dot_file * graph, dot_node id, char * label);
+
+/*!
+@brief Emits an edge between two pre-defined nodes.
+*/
+void dot_emit_edge(dot_file * graph, dot_node id1, dot_node id2);
+
 #endif

@@ -9,6 +9,7 @@
 
 #include "verilog-dot.h"
 #include "verilog-dot-emit.h"
+#include "verilog-ast-walk.h"
 #include "verilog-parser/src/verilog_parser.h"
 
 /*!
@@ -152,6 +153,9 @@ int main(int argc, char ** argv)
     
     // Create a dot file we will dump the AST into.
     dot_file * graph = dot_file_new(args -> output_file);
+
+    // Walk the syntax tree, generating the graph
+    walk_syntax_tree(graph, ast);
 
     // Clean up the output file and close it.
     dot_file_finish(graph);
