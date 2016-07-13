@@ -35,3 +35,13 @@ void dot_file_finish(dot_file * graph)
     fprintf(graph -> file, "}\n");
     fclose(graph -> file);
 }
+
+
+/*!
+@brief Generates a new node ID for the graph and returns it.
+*/
+dot_node dot_new_node(dot_file * graph)
+{
+    graph -> node_count ++;
+    return graph -> node_count;
+}
