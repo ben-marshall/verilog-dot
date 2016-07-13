@@ -56,4 +56,4 @@ is not yet supported, but enough is there to get the idea.
 Running the above example on [./tests/simple.v](./tests/simple.v) will give
 the following graph as output:
 
-![Example graph output](./tests/simple.svg)
+![Example graph output](./tests/simple.png)
