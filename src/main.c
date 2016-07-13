@@ -8,6 +8,7 @@
 #include <string.h>
 
 #include "verilog-dot.h"
+#include "verilog-dot-emit.h"
 #include "verilog-parser/src/verilog_parser.h"
 
 /*!
@@ -136,7 +137,11 @@ int main(int argc, char ** argv)
         printf("Parsing of input file successful.\n");
     }
 
+    // This is how we access the parsed source tree.
     verilog_source_tree * ast = yy_verilog_source_tree;
+    
+    // Create a dot file we will dump the AST into.
+    dot_file * graph = dot_file_new(args -> output_file);
 
     return 0;
 }

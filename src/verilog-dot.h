@@ -3,6 +3,10 @@
 @brief Contains common data structures and functions used by the program
 */
 
+#include <stdio.h>
+
+#ifndef VERILOG_DOT_H
+#define VERILOG_DOT_H
 
 //! A simple boolean type.
 typedef enum boolean_e{
@@ -27,3 +31,6 @@ typedef struct shell_args_t{
 @returns A shell_args pointer
 */
 shell_args * parse_args(int argc, char ** argv);
+
+
+#endif
