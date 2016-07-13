@@ -117,6 +117,16 @@ int main(int argc, char ** argv)
         return 1;
     }
 
+    // Open and validate the output file.
+    args -> output_file = fopen(args -> output_file_path, "w");
+    if(args -> output_file == NULL)
+    {
+        printf("ERROR: Unable to open output file for writing:\n");
+        printf("\t%s\n",args -> output_file_path);
+        free(args);
+        return 1;
+    }
+
 
     // Initialise the parser.
     verilog_parser_init();
@@ -142,6 +152,14 @@ int main(int argc, char ** argv)
     
     // Create a dot file we will dump the AST into.
     dot_file * graph = dot_file_new(args -> output_file);
+
+    // Clean up the output file and close it.
+    dot_file_finish(graph);
+
+    if(args -> verbose)
+    {
+        printf("Dot file writing complete!\n");
+    }
 
     return 0;
 }

@@ -29,5 +29,11 @@ the various output functions to write data to the output file.
 */
 dot_file * dot_file_new(FILE * writable);
 
+/*!
+@brief Finishes off the output file, writing any extra syntax.
+@post The output file is closed, and is a valid .dot file, ready to be
+viewed.
+*/
+void dot_file_finish(dot_file * graph);
 
 #endif
