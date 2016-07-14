@@ -9,9 +9,7 @@ module full_adder_1bit(
 
 wire a_xor_b;
 
-assign a_xor_b = a ^ b;
-
-assign sum     = a_xor_b ^ cin;
+assign a_xor_b = a ^ b, sum=a_xor_b ^ cin;
 
 assign carry   = (cin && a_xor_b) || (a && b);
 

@@ -57,35 +57,87 @@ void walk_net_declaration(
 ){
     dot_node id = dot_new_node(graph);
 
-    char * params[2];
-    params[0] = "Net Type";
-    params[1] = "Width";
+    char * params[3];
+    params[0] = "Identifier";
+    params[1] = "Net Type";
+    params[2] = "Width";
 
-    char * values[2];
+    char * values[3];
 
     char * type;
     switch(item -> type)
     {
         case DECLARE_NET:
             if(item -> net_type == NET_TYPE_WIRE){
-                values[0] = "Wire";
+                values[1] = "Wire";
+            } else {
+                values[1] = "Something exotic...";
             }
-            if(item -> range == NULL){
-                values[1] = "1 Bit";
-            } else{
-                values[1] = "Bit Range";
-            }
-            ast_identifier net_name = ast_list_get(item -> identifiers,0);
-
-            dot_emit_record_node(graph,id,
-                net_name->identifier,params,values,2);
-            dot_emit_edge(graph,parent,id);
-
             break;
+
+        case DECLARE_REG:
+            values[1] = "Reg";
+            break;
+
         default:
             break;
     }
+    
+    if(item -> range == NULL){
+        values[2] = "1 Bit";
+    } else{
+        values[2] = "Bit Range";
+    }
+            
+    ast_identifier net_name = ast_list_get(item -> identifiers,0);
+    values[0] = net_name->identifier;
+            
+    dot_emit_record_node(graph,id,"Declaration",params,values,3);
+    dot_emit_edge(graph,parent,id);
+}
+            
+/*!
+@brief Creates and emits nodes representing a continous assignment.
+*/
+void walk_continuous_assignment(
+    dot_file                * graph, //!< The graph to emit to.
+    dot_node                  parent, //!< parent node of the module.
+    ast_continuous_assignment * item   //!< The item to walk.
+){
+    dot_node super = dot_new_node(graph);
 
+    assert(item -> assignments != NULL);
+
+    char * sparams[2];
+    sparams[0] = "Delay";
+    sparams[1] = "Drive Strength";
+    char * svalues[2];
+    svalues[0] = " . ";
+    svalues[1] = " . ";
+
+    dot_emit_record_node(graph,super,"Continuous Assignments",
+        sparams,svalues,2);
+    dot_emit_edge(graph, parent,super);
+
+    int i;
+    for(i = 0; i < item -> assignments -> items; i ++)
+    {
+        dot_node said = dot_new_node(graph);
+
+        char * params[2];
+        params[0] = "L-Value";
+        params[1] = "Assign To";
+        char * values[2];
+        values[0];
+        values[1] = " . ";
+
+        ast_single_assignment * sa = ast_list_get(item -> assignments,i);
+        values[0] = sa -> lval -> data.identifier -> identifier;
+    
+        dot_emit_record_node(graph,said,"Single Assignment",
+            params,values,2);
+        dot_emit_edge(graph,super, said);
+    }
 }
 
 /*!
@@ -97,26 +149,19 @@ void walk_module_items(
     dot_node                  parent, //!< parent node of the module.
     ast_module_item         * item   //!< The item to walk.
 ){
-    char * item_type;
-
-    dot_node id = dot_new_node(graph);
-    dot_emit_edge(graph, parent, id);
 
     switch(item -> type)
     {
         case MOD_ITEM_NET_DECLARATION:
-            item_type = "Net Declaration";
-            walk_net_declaration(graph,id,item->net_declaration);
+            walk_net_declaration(graph,parent,item->net_declaration);
             break;
         case MOD_ITEM_CONTINOUS_ASSIGNMENT:
-            item_type = "Continuous Assignment";
+            walk_continuous_assignment(graph,parent,
+                item -> continuous_assignment);
             break;
         default:
-            item_type = "module_item";
             break;
     }
-    
-    dot_emit_node(graph, id, item_type);
 }
 
 /*!

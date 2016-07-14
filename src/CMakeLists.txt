@@ -13,5 +13,11 @@ set(VERILOG_DOT_EXE verilog-dot)
 
 set(VERILOG_PARSER_LIB verilogparser)
 
+SET(CMAKE_C_FLAGS_DEBUG "-g -O0 -Wall -W -fprofile-arcs -ftest-coverage")
+SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "-fprofile-arcs -ftest-coverage")
+
+SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}")
+SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE}")
+
 add_executable(${VERILOG_DOT_EXE} ${VERILOG_DOT_SRC})
 target_link_libraries(${VERILOG_DOT_EXE} verilogparser)
