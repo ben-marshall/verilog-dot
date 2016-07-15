@@ -21,3 +21,13 @@ SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE}")
 
 add_executable(${VERILOG_DOT_EXE} ${VERILOG_DOT_SRC})
 target_link_libraries(${VERILOG_DOT_EXE} verilogparser)
+
+
+add_custom_target(dots
+    COMMAND ${VERILOG_DOT_EXE} -v ../tests/simple.v
+    COMMAND dot -Tsvg ../tests/simple.v.dot > ../tests/simple.svg
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    DEPENDS ${VERILOG_DOT_EXE}
+    COMMENT "Testing Dot Exe"
+    VERBATIM
+)

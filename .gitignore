@@ -3,5 +3,6 @@
 
 build/
 tests/*.dot
+tests/*.svg
 
 

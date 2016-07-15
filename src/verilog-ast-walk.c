@@ -143,7 +143,7 @@ void walk_continuous_assignment(
 /*!
 @brief Walks over a module declaration, emiting nodes as appropriate.
 */
-void walk_module_declaration(
+dot_node walk_module_declaration(
     dot_file                * graph, //!< The graph to emit to.
     dot_node                  parent, //!< parent node of the module.
     ast_module_declaration  * module //!< The module to walk.
@@ -163,7 +163,39 @@ void walk_module_declaration(
         ast_port_declaration * port = ast_list_get(module->module_ports,p);
         walk_port_declaration(graph,portsParent,port);
     }
+    return newModule;
+}
 
+/*!
+@brief Recursively walks the module declaration and instantiation hierarcy.
+*/
+void walk_module_hierarchy(
+    dot_file                * graph, //!< The graph to emit to.
+    dot_node                  parent, //!< parent node of the module.
+    ast_module_declaration  * module //!< The module to walk.
+)
+{
+    dot_node dec = walk_module_declaration(graph, parent, module);
+    
+    int m;
+    for(m = 0; m < module -> module_instantiations -> items; m ++)
+    {
+        ast_module_instantiation * inst = 
+                            ast_list_get(module->module_instantiations,m);
+
+        char * sparams[2];
+        sparams[0] = "Module Name:";
+        sparams[1] = "Instance ID:";
+        char * svalues[1];
+        svalues[0] = ast_identifier_tostring(inst -> module_identifer);
+        svalues[1] = " ";
+
+        dot_node instanced = dot_new_node(graph);
+        dot_emit_record_node(graph,instanced,"Module Instantiation",
+            sparams,svalues,2);
+        dot_emit_edge(graph,dec,instanced);
+        
+    }
 }
 
 /*!
@@ -177,11 +209,19 @@ void walk_syntax_tree(
 
     dot_emit_node(graph,root,"Tree Root");
     
+    dot_node mod_hier = dot_new_node(graph);
+    dot_emit_node(graph, mod_hier, "Module Hierarchy");
+    dot_emit_edge(graph,root,mod_hier);
+    
     int m;
     for(m = 0; m < tree -> modules -> items; m ++)
     {
-        ast_module_declaration * module = ast_list_get(tree -> modules,m);
-        walk_module_declaration(graph, root, module);
+        ast_module_declaration * module = ast_list_get(tree->modules,m);
+        walk_module_hierarchy(
+            graph,
+            mod_hier,
+            module
+        );
     }
 }
 
