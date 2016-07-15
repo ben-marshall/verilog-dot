@@ -141,30 +141,6 @@ void walk_continuous_assignment(
 }
 
 /*!
-@brief Responsible for correctly identifying the type of a module item,
-and then moving to the next function which deals with it properly.
-*/
-void walk_module_items(
-    dot_file                * graph, //!< The graph to emit to.
-    dot_node                  parent, //!< parent node of the module.
-    ast_module_item         * item   //!< The item to walk.
-){
-
-    switch(item -> type)
-    {
-        case MOD_ITEM_NET_DECLARATION:
-            walk_net_declaration(graph,parent,item->net_declaration);
-            break;
-        case MOD_ITEM_CONTINOUS_ASSIGNMENT:
-            walk_continuous_assignment(graph,parent,
-                item -> continuous_assignment);
-            break;
-        default:
-            break;
-    }
-}
-
-/*!
 @brief Walks over a module declaration, emiting nodes as appropriate.
 */
 void walk_module_declaration(
@@ -182,22 +158,12 @@ void walk_module_declaration(
     dot_emit_edge(graph, newModule, portsParent);
 
     int p;
-    for(p = 0; p < module -> ports -> items; p ++)
+    for(p = 0; p < module -> module_ports -> items; p ++)
     {
-        ast_port_declaration * port = ast_list_get(module->ports,p);
+        ast_port_declaration * port = ast_list_get(module->module_ports,p);
         walk_port_declaration(graph,portsParent,port);
     }
 
-
-    dot_node constructsParent = dot_new_node(graph);
-    dot_emit_node(graph, constructsParent, "Constructs");
-    dot_emit_edge(graph, newModule, constructsParent);
-
-    for(p = 0; p < module -> constructs -> items; p++)
-    {
-        ast_module_item * item = ast_list_get(module -> constructs,p);
-        walk_module_items(graph,constructsParent,item);
-    }
 }
 
 /*!
