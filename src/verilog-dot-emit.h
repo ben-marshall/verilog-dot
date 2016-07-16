@@ -64,4 +64,9 @@ void dot_emit_record_node(
 */
 void dot_emit_edge(dot_file * graph, dot_node id1, dot_node id2);
 
+/*!
+@brief Emits a directed edge between two pre-defined nodes.
+*/
+void dot_emit_directed_edge(dot_file * graph, dot_node id1, dot_node id2);
+
 #endif

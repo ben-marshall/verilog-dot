@@ -45,10 +45,6 @@ void dot_draw_module_hierarchy(
     {
         ast_module_declaration * module = ast_list_get(source -> modules, m);
 
-        if(module -> module_instantiations -> items <= 1){
-            continue; //! Don't bother with making little modules roots.
-        }
-
         dot_node moduleID = dot_new_node(graph);
         dot_emit_node(graph, moduleID, 
             ast_identifier_tostring(module->identifier));

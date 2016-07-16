@@ -20,7 +20,8 @@ dot_file * dot_file_new(FILE * writable)
     tr -> node_count = 0;
     tr -> file       = writable;
 
-    fprintf(tr -> file, "\ngraph verilog_dot_graph{\n");
+    fprintf(tr -> file, "\ndigraph verilog_dot_graph{\n");
+    fprintf(tr -> file, "graph [pad=0,ranksep=3,nodesep=5];\n");
 
     return  tr;
 }
@@ -41,7 +42,7 @@ void dot_file_finish(dot_file * graph)
 */
 void dot_emit_node(dot_file * graph, dot_node id, char * label)
 {
-    fprintf(graph -> file,"\t%d [label=\"%s\"];\n",id,label);
+    fprintf(graph -> file,"\t%d [shape=box,label=\"%s\"];\n",id,label);
 }
 
 
@@ -74,7 +75,15 @@ void dot_emit_record_node(
 */
 void dot_emit_edge(dot_file * graph, dot_node id1, dot_node id2)
 {
-    fprintf(graph -> file, "\t %d -- %d\n", id1,id2);
+    fprintf(graph -> file, "\t %d -> %d\n", id1,id2);
+}
+
+/*!
+@brief Emits a directed edge between two pre-defined nodes.
+*/
+void dot_emit_directed_edge(dot_file * graph, dot_node id1, dot_node id2)
+{
+    fprintf(graph -> file, "\t %d -> %d\n", id1,id2);
 }
 
 /*!
