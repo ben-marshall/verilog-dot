@@ -150,6 +150,7 @@ int main(int argc, char ** argv)
             free(args);
             return 1;
         }
+        fclose(input_file);
     }
 
     // This is how we access the parsed source tree.
