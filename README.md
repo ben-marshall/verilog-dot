@@ -29,8 +29,11 @@ After building, you can use the dot file generator thusly:
 
 ```sh
 $> ./src/verilog-dot --help
-Usage: ./verilog-dot [args] [input file]
+
+Usage: ./verilog-dot [args] [input files]
 Options:
+--ast         - Draw the abstract syntax tree.
+--hierarchy   - Draw the module instance hierarchy.
 -h, --help    - Print this message and quit.
 -v, --verbose - Print verbose information messages.
 [-o | --output] <FILE PATH> 
