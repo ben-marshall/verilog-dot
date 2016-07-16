@@ -7,7 +7,8 @@ add_subdirectory(./verilog-parser)
 
 set(VERILOG_DOT_SRC main.c
                     verilog-dot-emit.c
-                    verilog-ast-walk.c)
+                    verilog-ast-walk.c
+                    verilog-module-inherit.c)
 
 set(VERILOG_DOT_EXE verilog-dot)
 

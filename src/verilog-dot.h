@@ -19,11 +19,12 @@ typedef enum boolean_e{
 @see parse_args
 */
 typedef struct shell_args_t{
-    char    * input_file_path;   //!< Where to source the input from.
+    int       input_files_start;    //!< From which command line argument do input files start.
     char    * output_file_path;  //!< Where to put the output.
-    FILE    * input_file;       //!< Input file handle
     FILE    * output_file;      //!< Output file handle.
     boolean   verbose;      //!< Be verbose in printing information messages.
+    boolean   draw_ast;         //!< Whether to draw the AST.
+    boolean   module_hierarchy; //!< Whether to draw the module heirarchy.
 } shell_args;
 
 /*!

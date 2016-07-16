@@ -8,17 +8,21 @@
 #include <string.h>
 
 #include "verilog-dot.h"
-#include "verilog-dot-emit.h"
 #include "verilog-ast-walk.h"
+#include "verilog-dot-emit.h"
+#include "verilog-module-inherit.h"
 #include "verilog-parser/src/verilog_parser.h"
+#include "verilog-parser/src/verilog_ast_util.h"
 
 /*!
 @brief Prints the help text and exists, depending on the parameters.
 */
 void print_help(boolean and_exit)
 {
-    printf("Usage: ./verilog-dot [args] [input file]\n");
+    printf("Usage: ./verilog-dot [args] [input files]\n");
     printf("Options:\n");
+    printf("--ast         - Draw the abstract syntax tree.\n");
+    printf("--hierarchy   - Draw the module instance hierarchy.\n");
     printf("-h, --help    - Print this message and quit.\n");
     printf("-v, --verbose - Print verbose information messages.\n");
     printf("[-o | --output] <FILE PATH> \n");
@@ -55,6 +59,14 @@ shell_args * parse_args(int argc, char ** argv)
         {
             tr -> verbose = BOOL_TRUE;
         }
+        else if(strcmp(argv[i], "--ast")     == 0)
+        {
+            tr -> draw_ast = BOOL_TRUE;
+        }
+        else if(strcmp(argv[i], "--hierarchy")     == 0)
+        {
+            tr -> module_hierarchy = BOOL_TRUE;
+        }
         else if(strcmp(argv[i], "-h")     == 0 ||
                 strcmp(argv[i], "--help") == 0)
         {
@@ -70,29 +82,16 @@ shell_args * parse_args(int argc, char ** argv)
                 tr -> output_file_path = argv[i];
             }
         }
-        else if(i == argc - 1)
-        {
-            tr -> input_file_path = argv[i];
-        }
         else
         {
-            free(tr);
-            printf("Unrecognised argument: '%s'\n", argv[i]);
-            print_help(BOOL_TRUE);
+            tr -> input_files_start = i;
+            break;
         }
     }
 
-    if(tr -> input_file_path == NULL)
-    {
-        free(tr);
-        print_help(BOOL_TRUE);
-    }
     if(tr -> output_file_path == NULL)
     {
-        size_t inleng = strlen(tr -> input_file_path);
-        tr -> output_file_path = calloc(inleng+4,sizeof(char));
-        strcat(tr -> output_file_path, tr -> input_file_path);
-        strcat(tr -> output_file_path, ".dot");
+        tr -> output_file_path = "graph.dot";
     }
 
     return tr;
@@ -101,21 +100,15 @@ shell_args * parse_args(int argc, char ** argv)
 int main(int argc, char ** argv)
 {
     shell_args * args = parse_args(argc,argv);
+    if(args -> draw_ast == BOOL_FALSE && 
+       args -> module_hierarchy == BOOL_FALSE){
+        free(args);
+        print_help(BOOL_TRUE);
+    }
     
     if(args -> verbose)
     {
-        printf("Input File:  %s\n", args -> input_file_path);
         printf("Output File: %s\n", args -> output_file_path);
-    }
-
-    // Open and validate the input file.
-    args -> input_file = fopen(args -> input_file_path, "r");
-    if(args -> input_file == NULL)
-    {
-        printf("ERROR: Unable to open input file for reading:\n");
-        printf("\t%s\n",args -> input_file_path);
-        free(args);
-        return 1;
     }
 
     // Open and validate the output file.
@@ -128,34 +121,55 @@ int main(int argc, char ** argv)
         return 1;
     }
 
-
     // Initialise the parser.
     verilog_parser_init();
 
-    // Parse our input file.
-    int result = verilog_parse_file(args -> input_file);
+    int F;
+    for(F = args -> input_files_start; F < argc; F++)
+    {
+        FILE * input_file = fopen(argv[F],"r");
+        if(input_file)
+        {
+            // Parse our input file.
+            int result = verilog_parse_file(input_file);
 
-    // If the parse didn't work, then print an error message and quit.
-    if(result != 0)
-    {
-        printf("ERROR: Failed to parse input file.\n");
-        printf("\t%s\n",args -> input_file_path);
-        free(args);
-        return 1;
-    }
-    else if(args -> verbose)
-    {
-        printf("Parsing of input file successful.\n");
+            // If the parse didn't work, print an error message and quit.
+            if(result != 0)
+            {
+                printf("ERROR: Failed to parse input file:");
+                printf("\t%s\n",argv[F]);
+            }
+            else if(args -> verbose)
+            {
+                printf("%s\n", argv[F]);
+            }
+        }
+        else
+        {
+            printf("ERROR Could not open file for reading: %s\n", argv[F]);
+            free(args);
+            return 1;
+        }
     }
 
     // This is how we access the parsed source tree.
     verilog_source_tree * ast = yy_verilog_source_tree;
+
+    // Resolve all of the names in the syntax tree.
+    verilog_resolve_modules(ast);
     
     // Create a dot file we will dump the AST into.
     dot_file * graph = dot_file_new(args -> output_file);
 
-    // Walk the syntax tree, generating the graph
-    walk_syntax_tree(graph, ast);
+    if(args -> draw_ast == BOOL_TRUE){
+        // Walk the syntax tree, generating the graph
+        walk_syntax_tree(graph, ast);
+    }
+
+    if(args -> module_hierarchy == BOOL_TRUE){
+        //! Draw the module inheritance hierarchy.
+        dot_draw_module_hierarchy(ast,graph);
+    }
 
     // Clean up the output file and close it.
     dot_file_finish(graph);
