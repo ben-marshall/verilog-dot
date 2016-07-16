@@ -56,4 +56,9 @@ is not yet supported, but enough is there to get the idea.
 Running the above example on [./tests/simple.v](./tests/simple.v) will give
 the following graph as output:
 
-![Example graph output](./tests/simple.png)
+![Example graph output](tests/simple.png)
+
+This graph shows the module hierarchy of the SPARCT1 microprocessors
+execution unit, or EXU.
+
+![Example graph output](tests/sparc_exu.png)
